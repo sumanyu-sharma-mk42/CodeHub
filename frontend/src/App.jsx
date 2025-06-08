@@ -27,8 +27,9 @@ function App() {
   
     if(isCheckingAuth && !authUser){ // it loads untill  checking is done
       return(
-        <div className="flex items-center justify-center h-screen">
-          <Loader className="size-10 animate-spin" />
+        <div className="flex flex-col items-center justify-center h-screen text-white font-mono space-y-4">
+          <Loader className="size-10 animate-spin text-[#2ea043]" />
+          <p>Loading... Render-hosted backend may take a moment.</p>
         </div>
       )
     }
