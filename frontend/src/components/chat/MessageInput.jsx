@@ -47,19 +47,18 @@ function MessageInput() {
   }
 
   return (
-    <div className="p-4 w-full">
+    <div className="p-4 border-t border-[#30363d] bg-[#161b22]">
       {image && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
             <img
               src={image}
               alt="Preview"
-              className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
+              className="w-20 h-20 object-cover rounded-lg border border-[#30363d]"
             />
             <button
               onClick={removeImage}
-              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
-              flex items-center justify-center"
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#0d1117] text-[#8b949e] hover:text-white flex items-center justify-center hover:bg-[#1f2428] transition-colors"
               type="button"
             >
               <X className="size-3" />
@@ -68,43 +67,46 @@ function MessageInput() {
         </div>
       )}
 
-      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+      <form onSubmit={handleSendMessage} className="flex items-center gap-2 mx-5">
         <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
-            placeholder="Type a message..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
           <input
             type="file"
             accept="image/*"
-            className="hidden"
             ref={fileInputRef}
             onChange={handleImageChange}
+            className="hidden"
           />
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
-                     ${image ? "text-emerald-500" : "text-zinc-400"}`}
+            className={`hidden sm:flex p-2 rounded-lg transition-colors ${
+              image ? "text-[#238636]" : "text-[#8b949e] hover:text-white"
+            } hover:bg-[#1f2428]`}
             onClick={() => fileInputRef.current?.click()}
           >
             <Image size={20} />
           </button>
+
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle text-zinc-400`}
+            className="hidden sm:flex p-2 rounded-lg transition-colors text-[#8b949e] hover:text-white hover:bg-[#1f2428]"
             onClick={handleCode}
           >
             <Code size={20} />
           </button>
+
+          <input
+            type="text"
+            className="flex-1 bg-[#0d1117] text-white border border-[#30363d] rounded-lg px-4 py-2 focus:outline-none focus:border-[#238636] font-mono"
+            placeholder="Type a message..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
         </div>
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
-          disabled={!text.trim() && !image} // if no input text or image then disabled
+          className="p-2 bg-[#238636] text-white rounded-lg hover:bg-[#2ea043] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!text.trim() && !image}
         >
           <Send size={22} />
         </button>

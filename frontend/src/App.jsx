@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import Homepage from './components/homepage/Homepage.jsx'
 import Signup from './components/signup/Signup.jsx'
 import Login from './components/login/Login.jsx'
-import Settings from './components/settings/Settings.jsx'
+import Settings from './components/settings/SettingsPage.jsx'
 import Profilepage from './components/profilepage/Profilepage.jsx'
 
 import {Loader} from 'lucide-react'
@@ -41,7 +41,7 @@ function App() {
         <Route path='/' element = {authUser ? <Homepage/> : <Navigate to="/login"/>} />
         <Route path='/signup' element = {!authUser ?  <Signup/> : <Navigate to="/"/>} />
         <Route path='/login' element = {!authUser ?  <Login/> : <Navigate to="/"/>} />
-        <Route path='/settings' element = {<Settings/>} />
+        {/* <Route path='/settings' element = {<Settings/>} /> */}
         <Route path='/profile' element = {authUser ? <Profilepage/> : <Navigate to="/login"/>} />
         <Route path='/editor/:sessionID' element = {authUser ?  <CodeEditor /> : <Navigate to="/"/>} /> {/* error not working */}
       </Routes> {/* // see the isuee with the offline becoming -1 due to the last route */}

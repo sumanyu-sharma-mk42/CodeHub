@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Pencil, Trash2, Plus, X } from "lucide-react";
 import { useAuthStore } from '../../store/useAuthStore';
+import capitalizeWords from '../../lib/capitalize.js';
 
 function Projects() {
     const [projects, setProjects] = useState([]);
@@ -29,17 +30,17 @@ function Projects() {
     };
 
     const handleAddProject = async () => {
+        await addingProject(formData);
         if(formData.title && formData.content){
             setProjects([...projects, formData]);
             setFormData({ title: "", content: "", from: "", to: "", url: "" });
             setShowForm(false);
         }
-        addingProject(formData);
     };
 
     const handleDelete = async (index) => {
         setProjects(projects.filter((_, i) => i !== index));
-        deleteProject(index);
+        await deleteProject(index);
     };
 
     const handleEdit = (index)=>{
@@ -51,50 +52,56 @@ function Projects() {
 
     const handleUpdate = async ()=>{
         const index = Index;
-        editProject(index,formData);
+        await editProject(index,formData);
         if(formData.title && formData.content) {setUpdateForm(false);setFormData({ title: "", content: "", from: "", to: "", url: "" });}
     }
-    
+
     return (
-        <div className="max-w-3xl mx-auto bg-base-300 rounded-xl p-6 space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-lg font-medium">Projects</h1>
+      <div className="w-full min-h-screen bg-[#0d1117] p-8 font-mono text-white flex flex-col items-center">
+        <div className="w-full max-w-6xl bg-[#161b22] rounded-xl p-8 border border-[#30363d] shadow-lg">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-semibold text-[#2ea043]">Projects</h2>
             <button
-              onClick={() => setShowForm(true)}
-              className="btn btn-sm bg-green-600 text-white hover:bg-green-700 rounded-xl flex items-center gap-2"
+              onClick={() => {
+                setShowForm(true);
+                setFormData({
+                  title: "",
+                  content: "",
+                  from: "",
+                  to: "",
+                  url: ""
+                });
+              }}
+              className="inline-flex items-center gap-2 px-5 py-3 bg-[#238636] hover:bg-[#2ea043] rounded-lg transition-colors shadow-md"
             >
-              <Plus className="w-4 h-4" />
-              Add Project
+              <Plus className="w-5 h-5" />
+              <span className="text-lg font-semibold">Add Project</span>
             </button>
           </div>
-        
-          {projects.length==0 && (<div className="text-center text-zinc-400 italic py-10">
-            You haven't added any projects yet.
-            <br />
-            <span className="text-sm text-zinc-500">Click "Add Project" to get started.</span>
-          </div>)}
-
-      
+  
+          {projects.length === 0 && (
+            <div className="text-center text-zinc-400 italic py-20 text-xl select-none">
+              You haven't added any projects yet.<br />
+              <span className="text-sm text-zinc-500">Click "Add Project" to get started.</span>
+            </div>
+          )}
+  
           {/* Project Cards */}
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, index) => (
               <div
                 key={index}
-                className="bg-base-200 p-4 rounded-xl border border-zinc-700 space-y-2 relative group"
+                className="bg-[#0d1117] p-6 rounded-xl border border-[#30363d] hover:border-[#238636] transition-colors shadow-md cursor-pointer group flex flex-col justify-between"
+                onClick={() => setPreviewProject(project)}
               >
-                {/* Clickable area for preview */}
-                <div
-                  onClick={() => setPreviewProject(project)} // define this to show full preview
-                  className="cursor-pointer overflow-hidden"
-                >
-                  <h3 className="font-semibold text-base truncate">{project.title}</h3>
+                <div>
+                  <h3 className="font-semibold text-xl truncate text-white mb-2">{capitalizeWords(project.title)}</h3>
                   <p
-                    className="text-sm text-zinc-400 overflow-hidden text-ellipsis"
-                    style={{ maxHeight: "3.6em" }} // roughly 3 lines of text
+                    className="text-sm text-[#8b949e] overflow-hidden text-ellipsis leading-relaxed max-h-[5.4em]"
                   >
                     {project.content}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-[#6e7681] mt-3">
                     {project?.from?.split("T")[0]} - {project.to?.split("T")[0]}
                   </p>
                   {project.url && (
@@ -102,154 +109,176 @@ function Projects() {
                       href={project.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 underline text-sm block"
-                      onClick={(e) => e.stopPropagation()} // prevent preview trigger
+                      className="text-[#238636] hover:text-[#2ea043] underline text-sm mt-2 inline-block"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       Visit Project
                     </a>
                   )}
                 </div>
-      
+  
                 {/* Buttons */}
-                <div className="flex justify-end gap-2 mt-2">
+                <div className="flex justify-end gap-3 mt-6 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    className="btn btn-xs bg-yellow-500 text-white hover:bg-yellow-600"
+                    className="p-2 bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleEdit(index);
                     }}
                   >
-                    <Pencil size={16} />
+                    <Pencil size={18} />
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(index);
                     }}
-                    className="btn btn-xs bg-red-600 text-white hover:bg-red-700"
+                    className="p-2 bg-[#da3633] hover:bg-[#f85149] text-white rounded-lg transition-colors"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-      
-          {/* Add Form Modal */}
-          {(showForm || updateForm) && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-              <div className="bg-base-100 p-6 rounded-lg w-full max-w-md space-y-4 border border-zinc-700">
-                <h3 className="text-lg font-medium">Add New Project</h3>
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Project Title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="input input-bordered w-full"
-                />
-                <textarea
-                  name="content"
-                  placeholder="Project Description"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  className="textarea textarea-bordered w-full"
-                />
-                <div className="flex gap-2">
+        </div>
+  
+        {/* Add/Edit Project Form Modal */}
+        {(showForm || updateForm) && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-6">
+            <div className="bg-[#161b22] p-8 rounded-2xl w-full max-w-xl border border-[#30363d] shadow-lg max-h-[90vh] overflow-y-auto">
+              <h3 className="text-2xl font-semibold mb-6 text-white">
+                {updateForm ? "Update Project" : "Add New Project"}
+              </h3>
+              <form className="space-y-6">
+                <div>
+                  <label className="block text-sm text-[#8b949e] mb-2">Title</label>
                   <input
-                    type="date"
-                    name="from"
-                    placeholder="From"
-                    value={formData.from}
+                    type="text"
+                    name="title"
+                    placeholder="Project Title"
+                    value={formData.title}
                     onChange={handleInputChange}
-                    className="input input-bordered w-full"
-                  />
-                  <input
-                    type="date"
-                    name="to"
-                    placeholder="To"
-                    value={formData.to}
-                    onChange={handleInputChange}
-                    className="input input-bordered w-full"
+                    className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-white focus:outline-none focus:border-[#238636]"
                   />
                 </div>
-                <input
-                  type="url"
-                  name="url"
-                  placeholder="Project URL"
-                  value={formData.url}
-                  onChange={handleInputChange}
-                  className="input input-bordered w-full"
-                />
-                <div className="flex justify-end gap-2">
+                <div>
+                  <label className="block text-sm text-[#8b949e] mb-2">Description</label>
+                  <textarea
+                    name="content"
+                    placeholder="Project Description"
+                    value={formData.content}
+                    onChange={handleInputChange}
+                    rows="5"
+                    className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-white focus:outline-none focus:border-[#238636]"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm text-[#8b949e] mb-2">From</label>
+                    <input
+                      type="date"
+                      name="from"
+                      value={formData.from}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-white focus:outline-none focus:border-[#238636]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[#8b949e] mb-2">To</label>
+                    <input
+                      type="date"
+                      name="to"
+                      value={formData.to}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-white focus:outline-none focus:border-[#238636]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-[#8b949e] mb-2">Project URL</label>
+                  <input
+                    type="url"
+                    name="url"
+                    placeholder="Project URL"
+                    value={formData.url}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg text-white focus:outline-none focus:border-[#238636]"
+                  />
+                </div>
+                <div className="flex justify-end gap-4 mt-6">
                   <button
+                    type="button"
                     onClick={() => {
                       setShowForm(false);
                       setUpdateForm(false);
+                      setFormData({
+                        title: "",
+                        content: "",
+                        from: "",
+                        to: "",
+                        url: ""
+                      });
                     }}
-                    className="btn btn-sm bg-zinc-600 text-white hover:bg-zinc-700"
+                    className="px-6 py-3 bg-[#161b22] text-[#8b949e] hover:text-white hover:bg-[#1f2428] rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       !updateForm ? handleAddProject() : handleUpdate();
                     }}
-                    className="btn btn-sm bg-green-600 text-white hover:bg-green-700"
+                    className="px-6 py-3 bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg transition-colors"
                   >
                     {!updateForm ? "Add" : "Update"}
                   </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        )}
+  
+        {/* Preview Modal */}
+        {previewProject && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
+            <div className="relative bg-[#161b22] p-8 rounded-2xl w-full max-w-3xl border border-[#30363d] shadow-lg space-y-6 max-h-[85vh] overflow-y-auto">
+              <button
+                onClick={() => setPreviewProject(null)}
+                className="absolute top-6 right-6 text-[#8b949e] hover:text-white transition-colors"
+              >
+                <X size={26} />
+              </button>
+  
+              <h2 className="text-3xl font-bold text-white border-b border-[#30363d] pb-3">
+                {capitalizeWords(previewProject.title)}
+              </h2>
+  
+              <div className="space-y-4">
+                <p className="text-base text-[#8b949e] whitespace-pre-wrap leading-relaxed">
+                  {previewProject.content}
+                </p>
+  
+                <p className="text-sm text-[#6e7681]">
+                  {previewProject?.from?.split("T")[0]} - {previewProject.to?.split("T")[0]}
+                </p>
+  
+                {previewProject.url && (
+                  <a
+                    href={previewProject.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#238636] hover:text-[#2ea043] underline text-base block"
+                  >
+                    🔗 Visit Project
+                  </a>
+                )}
               </div>
             </div>
-          )}
-
-          {/* Preview Modal */}
-            {previewProject && (
-            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-                <div className="relative bg-gradient-to-br from-base-200 to-base-100 p-6 rounded-2xl w-full max-w-xl border border-zinc-600 shadow-xl space-y-4 overflow-y-auto max-h-[85vh] text-white">
-                <button
-                    onClick={() => setPreviewProject(null)}
-                    className="absolute top-4 right-4 text-zinc-400 hover:text-white transition"
-                >
-                    <X size={22} />
-                </button>
-
-                <h2 className="text-2xl font-bold text-white border-b border-zinc-600 pb-2">
-                    {previewProject.title}
-                </h2>
-
-                <div className="space-y-2">
-                    <p className="text-sm text-zinc-300 whitespace-pre-wrap break-words leading-relaxed">
-                    {previewProject.content}
-                    </p>
-
-                    <p className="text-xs text-zinc-500 mt-2 italic">
-                    Duration:{" "}
-                    <span className="text-zinc-300">
-                        {previewProject.from?.split("T")[0]} - {previewProject.to?.split("T")[0]}
-                    </span>
-                    </p>
-
-                    {previewProject.url && (
-                    <a
-                        href={previewProject.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-3 text-sm font-medium text-blue-400 underline hover:text-blue-300 transition"
-                    >
-                        🔗 Visit Project
-                    </a>
-                    )}
-                </div>
-                </div>
-            </div>
-            )}
-
-
-
-        </div>
-      );
+          </div>
+        )}
+      </div>
+    );
       
 }
 

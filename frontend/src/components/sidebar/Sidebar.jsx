@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import useChatStore from '../../store/useChatStore'
 import SideBarSkeleton from './SideBarSkeleton';
-import { Loader, Loader2, Users } from 'lucide-react';
+import { Loader, Loader2, Users, Search, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import debounce from 'lodash';
+import capitalizeWords from '../../lib/capitalize';
 
 function Sidebar() {
   const {users, getUsers, selectedUser, setSelectedUser, isLoadingUsers,isSearching,searchBar} = useChatStore();
-  const {onlineUsers,authUser} = useAuthStore();
+  const {onlineUsers,authUser,logout} = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [searchUsers, setSearchUsers] = useState(null);
@@ -41,87 +42,103 @@ function Sidebar() {
   const filteredUsers = searchUsers? searchUsers.filter((user)=>user._id!=authUser._id) : showOnlineUsers ? users.filter((user)=>onlineUsers.includes(user._id)):users;
 
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-    {/* Header */}
-    <div className="border-b border-base-300 w-full p-5">
-      <div className="flex items-center gap-2">
-        <Users className="size-6" />
-        <span className="font-medium hidden lg:block">Contacts</span>
-      </div>
-
-      {/* search bar */}
-      <div className="mt-4 px-3 py-2 bg-base-100 rounded-md min-h-[48px]">
-        <input
-          type="text"
-          placeholder="Search users..."
-          className="w-full input input-sm input-bordered"
-          value={searchTerm}
-          onChange={(e)=>{setSearchTerm(e.target.value)}}
-        />
-      </div>
-    </div>
-    
-    {/* Main content: filter toggle Scrollable list */}
-    <div className="flex-1 flex flex-col min-h-0">
-
-      {/* Online filter toggle */}
-      {!searchUsers && <div className="mt-3 hidden lg:flex items-center justify-between px-5">
-        <label className="cursor-pointer flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={showOnlineUsers}
-            onChange={(e) => setShowOnlineUsers(e.target.checked)}
-            className="checkbox checkbox-sm"
-          />
-          <span className="text-sm">Show online only</span>
-        </label>
-
-        <span className="text-xs text-zinc-500">
-          ({onlineUsers.length - 1} online)
-        </span>
-      </div>}
-
-      {/* Scrollable Users List */}
-      {(isSearching)?
-      <div className="flex-1 flex justify-center items-center overflow-y-auto w-full py-3">
-        <Loader className="size-5 animate-spin text-zinc-500" />
-      </div>
-
-      :<>
-      <div className="flex-1 overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
-          <button
-            key={user._id}
-            onClick={() => setSelectedUser(user)}
-            className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors ${
-              selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""
-            }`}
-          >
-            <div className="relative mx-auto lg:mx-0">
-              <img
-                src={user.profilepic || "/avatar.png"}
-                alt={user.name}
-                className="size-12 object-cover rounded-full"
-              />
-              {onlineUsers.includes(user._id) && (
-                <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
-              )}
+    <div className="flex flex-col h-full bg-[#0d1117] border-r border-[#30363d] w-32 lg:w-96">
+        {/* Search Bar */}
+        <div className="p-4 border-b border-[#30363d]">
+            <div className="relative">
+                <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-[#161b22] text-white border border-[#30363d] rounded-lg px-4 py-2 pl-10 focus:outline-none focus:border-[#238636] font-mono"
+                />
+                <Search className="absolute left-3 top-2.5 text-[#8b949e]" size={18} />
             </div>
+        </div>
 
-            {/* User info */}
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullname}</div>
-              <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-              </div>
+        {/* Online Filter Toggle */}
+        {!searchTerm && (
+            <div className="px-4 py-2 border-b border-[#30363d]">
+                <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={showOnlineUsers}
+                            onChange={(e) => setShowOnlineUsers(e.target.checked)}
+                            className="checkbox checkbox-sm border-[#30363d] bg-[#161b22] checked:bg-[#238636] checked:border-[#238636]"
+                        />
+                        <span className="text-sm text-[#8b949e] font-mono">Show online only</span>
+                    </label>
+                    <span className="text-xs text-[#6e7681] font-mono">
+                        ({onlineUsers.length - 1} online)
+                    </span>
+                </div>
             </div>
-          </button>
-        ))}
-      </div>
-      </>}
-    </div>
-  </aside>
+        )}
 
+        {/* Users List */}
+        <div className="flex-1 overflow-y-auto">
+            {isSearching ? (
+                <div className="flex justify-center items-center h-full">
+                    <div className="loading loading-spinner text-[#238636]"></div>
+                </div>
+            ) : (
+                <div className="p-2">
+                    {filteredUsers.map((user) => (
+                        <div
+                            key={user._id}
+                            onClick={() => setSelectedUser(user)}
+                            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                                selectedUser?._id === user._id
+                                    ? "bg-[#163a19] text-white"
+                                    : "hover:bg-[#161b22] text-[#8b949e]"
+                            }`}
+                        >
+                            <div className="relative">
+                                <img
+                                    src={user.profilepic || "/avatar.png"}
+                                    alt={user.fullname}
+                                    className="w-10 h-10 rounded-full object-cover border border-[#30363d] hover:border-[#238636] transition-colors"
+                                />
+                                <div
+                                    className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[#0d1117] ${
+                                        onlineUsers.includes(user._id) ? "bg-[#238636]" : "bg-[#6e7681]"
+                                    }`}
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className={`font-medium truncate font-mono ${
+                                    selectedUser?._id === user._id ? "text-white" : "text-white"
+                                }`}>
+                                    {capitalizeWords(user.fullname)}
+                                </h3>
+                                <p className="text-sm truncate font-mono">
+                                    {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredUsers.length === 0 && (
+                        <div className="text-center text-[#8b949e] py-4 font-mono">
+                            No users found
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t border-[#30363d]">
+            <button
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 p-2 bg-[#161b22] text-[#8b949e] hover:text-white hover:bg-[#1f2428] rounded-lg transition-colors font-mono"
+            >
+                <LogOut size={18} />
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
   )
 }
 
