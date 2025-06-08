@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { io } from "socket.io-client";
 import { useCodeStore } from './useCodeStore.js';
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://codehub-hkx5.onrender.com";
 
 export const useAuthStore = create((set,get)=>({
     authUser: null,
