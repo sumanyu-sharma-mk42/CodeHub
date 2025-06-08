@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000/api",
+    baseURL: process.env.BACKEND_URL,
     withCredentials: true // to send cookies in every single request
 });
