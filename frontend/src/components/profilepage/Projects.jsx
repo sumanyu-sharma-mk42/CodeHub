@@ -30,17 +30,24 @@ function Projects() {
     };
 
     const handleAddProject = async () => {
+      try {
         await addingProject(formData);
         if(formData.title && formData.content){
             setProjects([...projects, formData]);
             setFormData({ title: "", content: "", from: "", to: "", url: "" });
             setShowForm(false);
         }
+      } catch (error) {
+      }
     };
 
     const handleDelete = async (index) => {
-        setProjects(projects.filter((_, i) => i !== index));
-        await deleteProject(index);
+        try {
+          await deleteProject(index);
+          setProjects(projects.filter((_, i) => i !== index));
+        } catch (error) {
+          
+        }
     };
 
     const handleEdit = (index)=>{
@@ -51,9 +58,13 @@ function Projects() {
     }
 
     const handleUpdate = async ()=>{
+      try {
         const index = Index;
         await editProject(index,formData);
         if(formData.title && formData.content) {setUpdateForm(false);setFormData({ title: "", content: "", from: "", to: "", url: "" });}
+      } catch (error) {
+        
+      }
     }
 
     return (
