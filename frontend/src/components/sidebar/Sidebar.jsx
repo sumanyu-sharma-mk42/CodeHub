@@ -10,7 +10,7 @@ function Sidebar() {
   const {onlineUsers,authUser} = useAuthStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
-  const [searchUsers, setSearchUsers] = useState();
+  const [searchUsers, setSearchUsers] = useState(null);
 
   useEffect(()=>{
     getUsers();
@@ -19,28 +19,22 @@ function Sidebar() {
 
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
-      if (searchTerm.trim() === '' & searchTerm!='') return;
+      if (searchTerm.trim() === '' ) {setSearchUsers(""); return}
   
       try {
         const result = await searchBar(searchTerm, 'live');
+        console.log("thisss", result);
         setSearchUsers(result);
       } catch (err) {
         console.error('Search error:', err);
       } 
     }, 500); // debounce delay in ms
   
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm]); // runs every time searchTerm changes
-  
-  
+    return () => clearTimeout(delayDebounce); //React uses returned function as a cleanup to run before re-running the effect or unmounting the component on any dependency change.
+  }, [searchTerm]); // runs every time searchTerm change
 
 
-  const handleSearch = async (inputField) => {
-    if(inputField.trim()=='' && inputField!='') return;
-    const result = await searchBar(inputField, "live");
-    console.log(result);
-    setSearchUsers(result);
-  };
+  
   
   if(isLoadingUsers) return <SideBarSkeleton/>
 
@@ -71,7 +65,7 @@ function Sidebar() {
     <div className="flex-1 flex flex-col min-h-0">
 
       {/* Online filter toggle */}
-      <div className="mt-3 hidden lg:flex items-center justify-between px-5">
+      {!searchUsers && <div className="mt-3 hidden lg:flex items-center justify-between px-5">
         <label className="cursor-pointer flex items-center gap-2">
           <input
             type="checkbox"
@@ -85,7 +79,7 @@ function Sidebar() {
         <span className="text-xs text-zinc-500">
           ({onlineUsers.length - 1} online)
         </span>
-      </div>
+      </div>}
 
       {/* Scrollable Users List */}
       {(isSearching)?
