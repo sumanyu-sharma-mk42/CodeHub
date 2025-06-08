@@ -7,7 +7,7 @@ import { app } from './utils/socket.js';
 
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: "https://codehub-eosin.vercel.app",
     credentials: true
 }));
 app.use(express.json({ limit: "10mb" }));
