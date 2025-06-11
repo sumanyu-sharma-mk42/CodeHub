@@ -86,7 +86,7 @@ export const logout = (req,res)=>{
         res.cookie("jwt","",{
             maxAge: 0,
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: "none",
             secure: process.env.ENV_MODE !== "development",
             path: "/",  // Make sure path matches cookie path
         });
