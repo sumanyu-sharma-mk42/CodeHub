@@ -10,10 +10,12 @@ export const protectroute = async(req,res,next)=>{
         }
         const decoder = jwt.verify(token, process.env.SECRET_KEY);
         if(!decoder){
+            console.log("token not veirifed");
             return res.status(401).json({message: "unauthorized"});
         }
         const user = await User.findById(decoder.userid).select("-password");
         if(!user){
+            console.log("no user sorry");
             return res.status(401).json({message: "unauthorized"});
         }
         req.user = user;
