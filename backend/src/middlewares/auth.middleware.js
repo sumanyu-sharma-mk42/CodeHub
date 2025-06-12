@@ -19,6 +19,10 @@ export const protectroute = async(req,res,next)=>{
             return res.status(401).json({message: "unauthorized"});
         }
         req.user = user;
+        
+        console.log("Cookies on request:", req.cookies);
+        console.log("JWT:", req.cookies.jwt);
+
         next();
     }
     catch(error){
