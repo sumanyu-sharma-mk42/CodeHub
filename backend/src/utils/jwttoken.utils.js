@@ -12,4 +12,6 @@ export const generatetoken = (userid,res)=>{
         secure: process.env.ENV_MODE!="development",
         path: "/",
     });
+    console.log("JWT cookie set", { secure: process.env.ENV_MODE !== "development", sameSite: "none" });
+
 } 
