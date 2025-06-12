@@ -126,5 +126,6 @@ export const useAuthStore = create((set,get)=>({
         }
     },
     setProfile: (val)=>set({profile:val})
+    
 
 }))
