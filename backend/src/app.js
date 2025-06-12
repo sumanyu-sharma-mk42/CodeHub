@@ -4,10 +4,7 @@ import cookieParser from 'cookie-parser';
 import { app } from './utils/socket.js';
 
 
-app.options('*', cors({
-    origin: "https://codehub-eosin.vercel.app",
-    credentials: true
-}));
+
 
 app.use(cors({
     origin: "https://codehub-eosin.vercel.app",
